@@ -114,7 +114,48 @@ At billions of rows, the next step would be an incremental model. For an order, 
 
 ## Exercises
 
-The queries for exercises 1 to 3 are in `analyses/` (run `dbt compile` to get the SQL with the table name filled in). Exercise 4 is the table `marts_orders` (orders of 2025 and 2026, with `qty_product` and `products`). Exercises 5 and 6 are the table `marts_orders_segmented` (orders of 2026, with `order_segmentation`).
+All answers come from the marts. Replace `<project>` and `<dataset>` with your own.
+
+**Exercise 1**: orders in 2026 (result: 2,573).
+
+```sql
+SELECT COUNT(DISTINCT order_id) AS count_orders
+FROM `<project>.<dataset>_marts.marts_orders`
+WHERE EXTRACT(YEAR FROM order_date) = 2026
+```
+
+**Exercise 2**: orders per month in 2026.
+
+```sql
+SELECT EXTRACT(MONTH FROM order_date) AS order_month, COUNT(DISTINCT order_id) AS count_orders
+FROM `<project>.<dataset>_marts.marts_orders`
+WHERE EXTRACT(YEAR FROM order_date) = 2026
+GROUP BY order_month
+ORDER BY order_month
+```
+
+**Exercise 3**: average number of products per order, per month in 2026. "Products" means units sold (`qty_product`).
+
+```sql
+SELECT EXTRACT(MONTH FROM order_date) AS order_month, ROUND(AVG(qty_product), 2) AS avg_product
+FROM `<project>.<dataset>_marts.marts_orders`
+WHERE EXTRACT(YEAR FROM order_date) = 2026
+GROUP BY order_month
+ORDER BY order_month
+```
+
+**Exercise 4**: the table `marts_orders` (orders of 2025 and 2026, with `qty_product` and `products`).
+
+**Exercise 5**: orders of 2026 per segment (New 1,079, Returning 799, VIP 695).
+
+```sql
+SELECT order_segmentation, COUNT(DISTINCT order_id) AS count_orders
+FROM `<project>.<dataset>_marts.marts_orders_segmented`
+GROUP BY order_segmentation
+ORDER BY order_segmentation
+```
+
+**Exercise 6**: the table `marts_orders_segmented` (orders of 2026, with `order_segmentation`).
 
 ## Known data issues
 
