@@ -1,0 +1,63 @@
+version: 2
+
+models:
+  - name: staging_orders
+    description: >
+      One row per order, from the raw orders file. Columns are renamed and the
+      date is cast. Nothing else is changed.
+    columns:
+      - name: order_date
+        description: "Date the order was placed."
+        tests: [not_null]
+      - name: customer_id
+        description: "ID of the customer who placed the order."
+        tests: [not_null]
+      - name: order_id
+        description: "Order ID. Unique."
+        tests: [unique, not_null]
+      - name: net_sales
+        description: "Total value of the order, excluding taxes."
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+
+  - name: staging_sales
+    description: >
+      One row per product in an order, from the raw sales file. Columns are
+      renamed and the date is cast. Nothing else is changed.
+    columns:
+      - name: order_date
+        description: "Date the order was placed."
+      - name: customer_id
+        description: "ID of the customer who placed the order."
+        tests: [not_null]
+      - name: order_id
+        description: "ID of the order this line belongs to."
+        tests:
+          - not_null
+          # Every sales line must belong to an order of staging_orders.
+          # One known orphan order (5361303, 2026-12-31) is in sales but not in
+          # orders, so the test warns on 1 row and only fails above 5.
+          - relationships:
+              to: ref('staging_orders')
+              field: order_id
+              config:
+                severity: error
+                warn_if: ">0"
+                error_if: ">5"
+      - name: product_id
+        description: "ID of the product sold."
+        tests: [not_null]
+      - name: net_sales
+        description: "Value of this product line, excluding taxes."
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: quantity
+        description: "Number of units of the product in the order."
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 1

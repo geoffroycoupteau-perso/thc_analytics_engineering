@@ -1,0 +1,59 @@
+version: 2
+
+models:
+  - name: marts_orders
+    description: >
+      Exercise 4. One row per order from 2025 and 2026, with the units sold
+      (qty_product) and the products in the order. The questions of exercises
+      1 to 3 are answered from this table. Clustered by customer_id.
+    columns:
+      - name: order_date
+        description: "Date the order was placed."
+        tests: [not_null]
+      - name: customer_id
+        description: "ID of the customer who placed the order."
+        tests: [not_null]
+      - name: order_id
+        description: "Order ID. Unique."
+        tests: [unique, not_null]
+      - name: net_sales
+        description: "Total value of the order, excluding taxes."
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: qty_product
+        description: "Total units in the order. 0 if the order has no product line."
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: products
+        description: "List of the products in the order. Each item has product_id, quantity and total_product_sales."
+
+  - name: marts_orders_segmented
+    description: >
+      Exercise 6. One row per order from 2026, with the segment of the order
+      (New, Returning or VIP), based on the customer's orders in the 12 months
+      before. The segment uses 2025 orders too, only the output is limited to
+      2026. The segment can be wrong before 2026-07-09, because the data starts
+      on 2025-07-09. Clustered by customer_id and order_segmentation.
+    columns:
+      - name: order_date
+        description: "Date the order was placed."
+        tests: [not_null]
+      - name: customer_id
+        description: "ID of the customer who placed the order."
+        tests: [not_null]
+      - name: order_id
+        description: "Order ID. Unique."
+        tests: [unique, not_null]
+      - name: net_sales
+        description: "Total value of the order, excluding taxes."
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: order_segmentation
+        description: "New (no prior order), Returning (1 to 3 prior orders) or VIP (4 or more)."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['New', 'Returning', 'VIP']

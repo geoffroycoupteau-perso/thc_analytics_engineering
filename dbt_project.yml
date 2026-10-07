@@ -1,0 +1,48 @@
+name: 'thc_analytics'
+version: '1.0.0'
+config-version: 2
+
+profile: 'thc_bigquery'
+
+model-paths: ["models"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+
+target-path: "target"
+clean-targets: ["target", "dbt_packages", "logs"]
+
+# Variables: change values here, not in the SQL files.
+vars:
+  # BigQuery dataset where the two raw tables are loaded
+  source_schema: thc_source
+  # Exercise 4: orders with qty_product
+  orders_start_date: '2025-01-01'
+  orders_end_date: '2026-12-31'
+  # Exercise 6: orders with their segment
+  segmented_start_date: '2026-01-01'
+  segmented_end_date: '2026-12-31'
+  # Segmentation
+  segment_lookback_days: 365
+  segment_returning_max_prior_orders: 3   # 1 to 3 prior orders = Returning, 4 or more = VIP
+  # Keep false on the BigQuery sandbox (partitions expire after 60 days and rows are lost). Set true in production.
+  use_partitioning: false
+
+# One dataset per layer: <dataset>_staging, <dataset>_intermediate, <dataset>_marts.
+# persist_docs sends our descriptions to BigQuery (tables and columns).
+models:
+  thc_analytics:
+    +persist_docs:
+      relation: true
+      columns: true
+    # Light copy of the raw data: views cost nothing to store
+    staging:
+      +schema: staging
+      +materialized: view
+    # Business logic, one step at a time
+    intermediate:
+      +schema: intermediate
+      +materialized: view
+    # Final tables used for analysis
+    marts:
+      +schema: marts
+      +materialized: table
