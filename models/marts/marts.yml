@@ -3,8 +3,9 @@ version: 2
 models:
   - name: marts_orders
     description: >
-      One row per order from 2025 and 2026, with the units sold
-      and the products in the order.
+      Exercise 4. One row per order from 2025 and 2026, with the units sold
+      (qty_product) and the products in the order. The questions of exercises
+      1 to 3 are answered from this table. Clustered by customer_id.
     columns:
       - name: order_date
         description: "Date the order was placed."
@@ -30,8 +31,11 @@ models:
 
   - name: marts_orders_segmented
     description: >
-      One row per order from 2026, with the segment of the order
-      (based on the customer's orders in the 12 months before).
+      Exercise 6. One row per order from 2026, with the segment of the order
+      (New, Returning or VIP), based on the customer's orders in the 12 months
+      before. The segment uses 2025 orders too, only the output is limited to
+      2026. The segment can be wrong before 2026-07-09, because the data starts
+      on 2025-07-09. Clustered by customer_id and order_segmentation.
     columns:
       - name: order_date
         description: "Date the order was placed."

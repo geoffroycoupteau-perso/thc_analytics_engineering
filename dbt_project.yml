@@ -11,7 +11,9 @@ macro-paths: ["macros"]
 target-path: "target"
 clean-targets: ["target", "dbt_packages", "logs"]
 
+# Variables: change values here, not in the SQL files.
 vars:
+  # BigQuery dataset where the two raw tables are loaded
   source_schema: thc_source
   # Exercise 4: orders with qty_product
   orders_start_date: '2025-01-01'
@@ -25,17 +27,22 @@ vars:
   # Keep false on the BigQuery sandbox (partitions expire after 60 days and rows are lost). Set true in production.
   use_partitioning: false
 
+# One dataset per layer: <dataset>_staging, <dataset>_intermediate, <dataset>_marts.
+# persist_docs sends our descriptions to BigQuery (tables and columns).
 models:
   thc_analytics:
     +persist_docs:
       relation: true
       columns: true
+    # Light copy of the raw data: views cost nothing to store
     staging:
       +schema: staging
       +materialized: view
+    # Business logic, one step at a time
     intermediate:
       +schema: intermediate
       +materialized: view
+    # Final tables used for analysis
     marts:
       +schema: marts
       +materialized: table

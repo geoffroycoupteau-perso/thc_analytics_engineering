@@ -2,7 +2,10 @@ version: 2
 
 models:
   - name: intermediate_orders
-    description: "One row per order, with the number of units sold and the list of products in it."
+    description: >
+      One row per order, with the number of units sold (qty_product) and the
+      list of products. Built from staging_orders and staging_sales. An order
+      with no sales line is kept, with qty_product = 0.
     columns:
       - name: order_id
         description: "Order ID. Unique."
@@ -24,7 +27,10 @@ models:
         description: "List of the products in the order. Each item has product_id, quantity and total_product_sales."
 
   - name: intermediate_orders_segmented
-    description: "One row per order with its segment, based on the customer's orders in the 12 months before."
+    description: >
+      One row per order with its segment (New, Returning or VIP), based on the
+      orders the same customer placed in the 12 months before. It reads all
+      orders, not only 2026, because the history is needed.
     columns:
       - name: order_id
         description: "Order ID. Unique."
@@ -36,7 +42,7 @@ models:
           - dbt_utils.accepted_range:
               min_value: 0
       - name: order_segmentation
-        description: "New (no prior order), Returning (1 to 3 prior orders) or VIP (4 or more)."
+        description: "New (no prior order), Returning (1 to 3 prior orders) or VIP (4 or more). The thresholds are variables in dbt_project.yml."
         tests:
           - accepted_values:
               values: ['New', 'Returning', 'VIP']

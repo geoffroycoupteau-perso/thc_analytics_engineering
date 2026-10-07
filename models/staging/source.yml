@@ -1,17 +1,20 @@
 version: 2
 
 sources:
+  # The two raw files, loaded as tables in BigQuery before running dbt.
+  # dbt only reads them. Every model reads them through source(), never directly.
   - name: raw
+    description: "Raw data given for the challenge, loaded as is."
     database: "{{ target.database }}"
     schema: "{{ var('source_schema') }}"
     tables:
       - name: orders
         identifier: orders_recrutement
-        description: "Raw orders file. One row per order."
+        description: "Raw orders file (2025-07-09 to 2026-12-31). One row per order."
         columns:
           - name: orders_id
-            description: "Order ID."
+            description: "Order ID. Must be unique and never empty."
             tests: [unique, not_null]
       - name: sales
         identifier: sales_recrutement
-        description: "Raw sales file. One row per order and product."
+        description: "Raw sales file. One row per order and per product (an order has many lines)."
