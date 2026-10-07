@@ -1,0 +1,13 @@
+thc_bigquery:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: "{{ env_var('DBT_AUTH_METHOD', 'oauth') }}"
+      project: "{{ env_var('DBT_PROJECT') }}"
+      dataset: "{{ env_var('DBT_DATASET', 'sales_recruitment') }}"
+      keyfile: "{{ env_var('DBT_KEYFILE', '') }}"
+      threads: 4
+      timeout_seconds: 300
+      location: "{{ env_var('DBT_LOCATION', 'EU') }}"
+      priority: interactive

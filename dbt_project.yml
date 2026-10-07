@@ -1,0 +1,41 @@
+name: 'thc_analytics'
+version: '1.0.0'
+config-version: 2
+
+profile: 'thc_bigquery'
+
+model-paths: ["models"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+
+target-path: "target"
+clean-targets: ["target", "dbt_packages", "logs"]
+
+vars:
+  source_schema: thc_source
+  # Exercise 4: orders with qty_product
+  orders_start_date: '2025-01-01'
+  orders_end_date: '2026-12-31'
+  # Exercise 6: orders with their segment
+  segmented_start_date: '2026-01-01'
+  segmented_end_date: '2026-12-31'
+  # Segmentation
+  segment_lookback_days: 365
+  segment_returning_max_prior_orders: 3   # 1 to 3 prior orders = Returning, 4 or more = VIP
+  # Keep false on the BigQuery sandbox (partitions expire after 60 days and rows are lost). Set true in production.
+  use_partitioning: false
+
+models:
+  thc_analytics:
+    +persist_docs:
+      relation: true
+      columns: true
+    staging:
+      +schema: staging
+      +materialized: view
+    intermediate:
+      +schema: intermediate
+      +materialized: view
+    marts:
+      +schema: marts
+      +materialized: table

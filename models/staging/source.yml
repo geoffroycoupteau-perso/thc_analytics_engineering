@@ -1,0 +1,17 @@
+version: 2
+
+sources:
+  - name: raw
+    database: "{{ target.database }}"
+    schema: "{{ var('source_schema') }}"
+    tables:
+      - name: orders
+        identifier: orders_recrutement
+        description: "Raw orders file. One row per order."
+        columns:
+          - name: orders_id
+            description: "Order ID."
+            tests: [unique, not_null]
+      - name: sales
+        identifier: sales_recrutement
+        description: "Raw sales file. One row per order and product."
