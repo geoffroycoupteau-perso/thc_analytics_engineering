@@ -1,0 +1,44 @@
+version: 2
+
+models:
+  - name: intermediate_orders
+    description: "One row per order, with the number of units sold and the list of products in it."
+    columns:
+      - name: order_id
+        description: "Order ID. Unique."
+        tests: [unique, not_null]
+      - name: customer_id
+        description: "ID of the customer who placed the order."
+        tests: [not_null]
+      - name: order_date
+        description: "Date the order was placed."
+      - name: net_sales
+        description: "Total value of the order, excluding taxes."
+      - name: qty_product
+        description: "Total units in the order. 0 if the order has no product line."
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: products
+        description: "List of the products in the order. Each item has product_id, quantity and total_product_sales."
+
+  - name: intermediate_orders_segmented
+    description: "One row per order with its segment, based on the customer's orders in the 12 months before."
+    columns:
+      - name: order_id
+        description: "Order ID. Unique."
+        tests: [unique, not_null]
+      - name: prior_orders_12m
+        description: "Orders the customer placed in the 12 months before this one."
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: order_segmentation
+        description: "New (no prior order), Returning (1 to 3 prior orders) or VIP (4 or more)."
+        tests:
+          - accepted_values:
+              values: ['New', 'Returning', 'VIP']
+      - name: is_lookback_complete
+        description: "False when the 12 months before the order start before our first data day. The segment may then be wrong."
