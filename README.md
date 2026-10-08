@@ -1,6 +1,8 @@
-# THC Analytics: dbt + BigQuery
+# THC Analytics: dbt, BigQuery and LookML
 
-dbt project for the Astrafy take-home challenge (Part 1). It turns two raw files (orders and sales lines) into one table with one row per order, the quantity of products, and the customer segment (New, Returning, VIP).
+Solution for Parts 1 and 2 of the Astrafy take-home challenge. The dbt project transforms the raw order and sales files in BigQuery. The [`looker/`](looker/) directory contains the LookML semantic layer for order, sales, customer segment and product analysis.
+
+The LookML was developed and validated in a private Looker development environment. The public code does not contain company connections or internal project references.
 
 ## Project layout
 
